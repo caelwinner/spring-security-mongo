@@ -14,11 +14,8 @@ import uk.co.caeldev.springsecuritymongo.repositories.MongoOAuth2ClientTokenRepo
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.co.caeldev.springsecuritymongo.builders.MongoOAuth2ClientTokenBuilder.mongoOAuth2ClientTokenBuilder;
 import static uk.co.caeldev.springsecuritymongo.builders.OAuth2AccessTokenBuilder.oAuth2AccessTokenBuilder;
 import static uk.co.caeldev.springsecuritymongo.builders.OAuth2ProtectedResourceDetailsBuilder.oAuth2ProtectedResourceDetailsBuilder;
