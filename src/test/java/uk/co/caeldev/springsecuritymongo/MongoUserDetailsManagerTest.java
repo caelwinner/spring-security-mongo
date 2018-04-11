@@ -85,7 +85,6 @@ public class MongoUserDetailsManagerTest {
     public void shouldDeleteUser() {
         // Given
         final String username = string().next();
-        final User user = UserBuilder.userBuilder().username(username).build();
 
         // When
         mongoUserDetailsManager.deleteUser(username);
