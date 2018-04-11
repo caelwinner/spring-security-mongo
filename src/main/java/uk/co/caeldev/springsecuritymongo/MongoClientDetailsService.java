@@ -101,10 +101,10 @@ public class MongoClientDetailsService implements ClientDetailsService, ClientRe
         if (clientDetails.isAutoApprove("true")) {
             return newHashSet("true"); // all scopes autoapproved
         }
-        return filter(clientDetails.getScope(), ByAutoApproveOfScope(clientDetails));
+        return filter(clientDetails.getScope(), byAutoApproveOfScope(clientDetails));
     }
 
-    private Predicate<String> ByAutoApproveOfScope(final ClientDetails clientDetails) {
+    private Predicate<String> byAutoApproveOfScope(final ClientDetails clientDetails) {
         return scope -> clientDetails.isAutoApprove(scope);
     }
 

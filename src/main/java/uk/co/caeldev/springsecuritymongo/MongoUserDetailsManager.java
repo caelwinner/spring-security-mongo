@@ -3,7 +3,6 @@ package uk.co.caeldev.springsecuritymongo;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +19,9 @@ import uk.co.caeldev.springsecuritymongo.services.SecurityContextService;
 
 import java.util.Collection;
 import java.util.Optional;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Component
 public class MongoUserDetailsManager implements UserDetailsManager {
@@ -66,7 +68,7 @@ public class MongoUserDetailsManager implements UserDetailsManager {
     public void changePassword(final String oldPassword, final String newPassword) {
         final Authentication currentUser = securityContextService.getAuthentication();
 
-        if (currentUser == null) {
+        if (isNull(currentUser)) {
             // This would indicate bad coding somewhere
             throw new AccessDeniedException("Can't change password as no Authentication object found in context " +
                     "for current user.");
@@ -75,7 +77,7 @@ public class MongoUserDetailsManager implements UserDetailsManager {
         final String username = currentUser.getName();
 
         // If an authentication manager has been set, re-authenticate the user with the supplied password.
-        if (authenticationManager != null) {
+        if (nonNull(authenticationManager)) {
             logger.debug("Reauthenticating user '"+ username + "' for password change request.");
 
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, oldPassword));
