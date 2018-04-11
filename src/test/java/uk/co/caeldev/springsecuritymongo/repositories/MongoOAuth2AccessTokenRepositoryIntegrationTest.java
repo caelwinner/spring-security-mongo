@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -24,9 +23,6 @@ public class MongoOAuth2AccessTokenRepositoryIntegrationTest {
 
     @Rule
     public FongoRule fongoRule = new FongoRule();
-
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Autowired
     private MongoOAuth2AccessTokenRepository mongoOAuth2AccessTokenRepository;
