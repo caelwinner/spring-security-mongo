@@ -12,4 +12,5 @@ before_install:
 
 after_success:
   - ./gradlew uploadArchives
+  - ./gradlew jacocoTestReport
   - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
