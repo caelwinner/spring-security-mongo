@@ -35,13 +35,16 @@ public class MongoApprovalRepositoryIntegrationTest {
         //Given
         final String clientId = string().next();
         final String userId = string().next();
-        final MongoApproval mongoApproval = MongoApprovalBuilder.mongoApprovalBuilder().clientId(clientId).userId(userId).build();
+        final MongoApproval mongoApproval = MongoApprovalBuilder.mongoApprovalBuilder()
+                .clientId(clientId).userId(userId).build();
 
         //When
         mongoApprovalRepository.save(mongoApproval);
 
         //Then
-        final List<MongoApproval> byUserIdAndClientId = mongoApprovalRepository.findByUserIdAndClientId(userId, clientId);
-        assertThat(byUserIdAndClientId).isNotEmpty();
+        final List<MongoApproval> results = mongoApprovalRepository.findByUserIdAndClientId(userId, clientId);
+        assertThat(results).isNotEmpty();
+        final MongoApproval approval = results.get(0);
+        assertThat(approval).isEqualToComparingFieldByField(approval);
     }
 }

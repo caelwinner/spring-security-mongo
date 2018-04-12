@@ -8,6 +8,8 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 
 import java.util.*;
 
+import static java.util.Objects.isNull;
+
 @Document
 public class MongoClientDetails implements ClientDetails {
 
@@ -21,7 +23,7 @@ public class MongoClientDetails implements ClientDetails {
     private List<GrantedAuthority> authorities = Collections.emptyList();
     private Integer accessTokenValiditySeconds;
     private Integer refreshTokenValiditySeconds;
-    private Map<String, Object> additionalInformation = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalInformation = new LinkedHashMap<>();
     private Set<String> autoApproveScopes;
 
     public MongoClientDetails() {
@@ -113,7 +115,7 @@ public class MongoClientDetails implements ClientDetails {
 
     @Override
     public boolean isAutoApprove(final String scope) {
-        if (autoApproveScopes == null) {
+        if (isNull(autoApproveScopes)) {
             return false;
         }
         for (String auto : autoApproveScopes) {

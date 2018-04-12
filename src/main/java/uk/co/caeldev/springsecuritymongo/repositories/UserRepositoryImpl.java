@@ -20,8 +20,8 @@ public class UserRepositoryImpl implements UserRepositoryBase {
 
     @Override
     public boolean changePassword(final String oldPassword,
-                               final String newPassword,
-                               final String username) {
+                                  final String newPassword,
+                                  final String username) {
         final Query searchUserQuery = new Query(where("username").is(username).andOperator(where("password").is(oldPassword)));
         final UpdateResult updateResult = mongoTemplate.updateFirst(searchUserQuery, update("password", newPassword), User.class);
         return updateResult.wasAcknowledged();

@@ -1,7 +1,5 @@
 package uk.co.caeldev.springsecuritymongo;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.common.util.SerializationUtils;
@@ -20,9 +18,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-import static com.google.common.collect.Collections2.filter;
-import static com.google.common.collect.Collections2.transform;
+import static java.util.Objects.nonNull;
+import static org.springframework.security.oauth2.common.util.SerializationUtils.deserialize;
+import static org.springframework.security.oauth2.common.util.SerializationUtils.serialize;
 
 @Component
 public class MongoTokenStore implements TokenStore {
@@ -52,7 +53,7 @@ public class MongoTokenStore implements TokenStore {
 
         final MongoOAuth2AccessToken mongoOAuth2AccessToken = mongoOAuth2AccessTokenRepository.findByTokenId(tokenId);
 
-        if (mongoOAuth2AccessToken != null) {
+        if (nonNull(mongoOAuth2AccessToken)) {
             try {
                 return deserializeAuthentication(mongoOAuth2AccessToken.getAuthentication());
             } catch (IllegalArgumentException e) {
@@ -67,11 +68,11 @@ public class MongoTokenStore implements TokenStore {
     public void storeAccessToken(final OAuth2AccessToken token,
                                  final OAuth2Authentication authentication) {
         String refreshToken = null;
-        if (token.getRefreshToken() != null) {
+        if (nonNull(token.getRefreshToken())) {
             refreshToken = token.getRefreshToken().getValue();
         }
 
-        if (readAccessToken(token.getValue())!=null) {
+        if (nonNull(readAccessToken(token.getValue()))) {
             removeAccessToken(token.getValue());
         }
 
@@ -88,16 +89,11 @@ public class MongoTokenStore implements TokenStore {
         mongoOAuth2AccessTokenRepository.save(oAuth2AccessToken);
     }
 
-    public void removeAccessToken(final String tokenValue) {
-        final String tokenKey = extractTokenKey(tokenValue);
-        mongoOAuth2AccessTokenRepository.deleteByTokenId(tokenKey);
-    }
-
     @Override
     public OAuth2AccessToken readAccessToken(final String tokenValue) {
         final String tokenKey = extractTokenKey(tokenValue);
         final MongoOAuth2AccessToken mongoOAuth2AccessToken = mongoOAuth2AccessTokenRepository.findByTokenId(tokenKey);
-        if (mongoOAuth2AccessToken != null) {
+        if (nonNull(mongoOAuth2AccessToken)) {
             try {
                 return deserializeAccessToken(mongoOAuth2AccessToken.getToken());
             } catch (IllegalArgumentException e) {
@@ -129,7 +125,7 @@ public class MongoTokenStore implements TokenStore {
         final String tokenKey = extractTokenKey(tokenValue);
         final MongoOAuth2RefreshToken mongoOAuth2RefreshToken = mongoOAuth2RefreshTokenRepository.findByTokenId(tokenKey);
 
-        if (mongoOAuth2RefreshToken != null) {
+        if (nonNull(mongoOAuth2RefreshToken)) {
             try {
                 return deserializeRefreshToken(mongoOAuth2RefreshToken.getToken());
             } catch (IllegalArgumentException e) {
@@ -180,27 +176,17 @@ public class MongoTokenStore implements TokenStore {
     @Override
     public Collection<OAuth2AccessToken> findTokensByClientIdAndUserName(String clientId, String userName) {
         final List<MongoOAuth2AccessToken> oAuth2AccessTokens = mongoOAuth2AccessTokenRepository.findByUsernameAndClientId(userName, clientId);
-        final Collection<MongoOAuth2AccessToken> noNullsTokens = filter(oAuth2AccessTokens, byNotNulls());
-        return transform(noNullsTokens, toOAuth2AccessToken());
-    }
-
-    private Predicate<MongoOAuth2AccessToken> byNotNulls() {
-        return token -> token != null;
-    }
-
-    private Function<MongoOAuth2AccessToken, OAuth2AccessToken> toOAuth2AccessToken() {
-        return token -> SerializationUtils.deserialize(token.getToken());
+        return transformToOAuth2AccessTokens(oAuth2AccessTokens);
     }
 
     @Override
     public Collection<OAuth2AccessToken> findTokensByClientId(final String clientId) {
         final List<MongoOAuth2AccessToken> oAuth2AccessTokens = mongoOAuth2AccessTokenRepository.findByClientId(clientId);
-        final Collection<MongoOAuth2AccessToken> noNullTokens = filter(oAuth2AccessTokens, byNotNulls());
-        return transform(noNullTokens, toOAuth2AccessToken());
+        return transformToOAuth2AccessTokens(oAuth2AccessTokens);
     }
 
-    protected String extractTokenKey(String value) {
-        if (value == null) {
+    protected String extractTokenKey(final String value) {
+        if (Objects.isNull(value)) {
             return null;
         }
         MessageDigest digest;
@@ -220,36 +206,36 @@ public class MongoTokenStore implements TokenStore {
         }
     }
 
-    protected byte[] serializeAccessToken(OAuth2AccessToken token) {
-        return SerializationUtils.serialize(token);
+    protected byte[] serializeAccessToken(final OAuth2AccessToken token) {
+        return serialize(token);
     }
 
-    protected byte[] serializeRefreshToken(OAuth2RefreshToken token) {
-        return SerializationUtils.serialize(token);
+    protected byte[] serializeRefreshToken(final OAuth2RefreshToken token) {
+        return serialize(token);
     }
 
-    protected byte[] serializeAuthentication(OAuth2Authentication authentication) {
-        return SerializationUtils.serialize(authentication);
+    protected byte[] serializeAuthentication(final OAuth2Authentication authentication) {
+        return serialize(authentication);
     }
 
-    protected OAuth2AccessToken deserializeAccessToken(byte[] token) {
-        return SerializationUtils.deserialize(token);
+    protected OAuth2AccessToken deserializeAccessToken(final byte[] token) {
+        return deserialize(token);
     }
 
-    protected OAuth2RefreshToken deserializeRefreshToken(byte[] token) {
-        return SerializationUtils.deserialize(token);
+    protected OAuth2RefreshToken deserializeRefreshToken(final byte[] token) {
+        return deserialize(token);
     }
 
-    protected OAuth2Authentication deserializeAuthentication(byte[] authentication) {
-        return SerializationUtils.deserialize(authentication);
+    protected OAuth2Authentication deserializeAuthentication(final byte[] authentication) {
+        return deserialize(authentication);
     }
 
-    public OAuth2Authentication readAuthenticationForRefreshToken(String value) {
+    public OAuth2Authentication readAuthenticationForRefreshToken(final String value) {
         final String tokenId = extractTokenKey(value);
 
         final MongoOAuth2RefreshToken mongoOAuth2RefreshToken = mongoOAuth2RefreshTokenRepository.findByTokenId(tokenId);
 
-        if (mongoOAuth2RefreshToken != null) {
+        if (nonNull(mongoOAuth2RefreshToken)) {
             try {
                 return deserializeAuthentication(mongoOAuth2RefreshToken.getAuthentication());
             } catch (IllegalArgumentException e) {
@@ -260,14 +246,26 @@ public class MongoTokenStore implements TokenStore {
         return null;
     }
 
-    public void removeRefreshToken(String token) {
+    private void removeRefreshToken(final String token) {
         final String tokenId = extractTokenKey(token);
         mongoOAuth2RefreshTokenRepository.deleteByTokenId(tokenId);
     }
 
-    public void removeAccessTokenUsingRefreshToken(final String refreshToken) {
+    private void removeAccessTokenUsingRefreshToken(final String refreshToken) {
         final String tokenId = extractTokenKey(refreshToken);
         mongoOAuth2AccessTokenRepository.deleteByRefreshTokenId(tokenId);
 
+    }
+
+    private void removeAccessToken(final String tokenValue) {
+        final String tokenKey = extractTokenKey(tokenValue);
+        mongoOAuth2AccessTokenRepository.deleteByTokenId(tokenKey);
+    }
+
+    private Collection<OAuth2AccessToken> transformToOAuth2AccessTokens(final List<MongoOAuth2AccessToken> oAuth2AccessTokens) {
+        return oAuth2AccessTokens.stream()
+                .filter(Objects::nonNull)
+                .map(token -> SerializationUtils.<OAuth2AccessToken>deserialize(token.getToken()))
+                .collect(Collectors.toList());
     }
 }

@@ -1,6 +1,5 @@
 package uk.co.caeldev.springsecuritymongo;
 
-import com.google.common.base.Function;
 import org.springframework.security.oauth2.provider.approval.Approval;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.stereotype.Component;
@@ -13,8 +12,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-import static com.google.common.collect.Collections2.transform;
+import static java.util.Objects.isNull;
 import static uk.co.caeldev.springsecuritymongo.util.LocalDateTimeUtil.convertTolocalDateTimeFrom;
 
 @Component
@@ -30,7 +30,7 @@ public class MongoApprovalStore implements ApprovalStore {
 
     @Override
     public boolean addApprovals(final Collection<Approval> approvals) {
-        final Collection<MongoApproval> mongoApprovals = transform(approvals, toMongoApproval());
+        final Collection<MongoApproval> mongoApprovals = transformToMongoApproval(approvals);
 
         return mongoApprovalRepository.updateOrCreate(mongoApprovals);
     }
@@ -39,7 +39,7 @@ public class MongoApprovalStore implements ApprovalStore {
     public boolean revokeApprovals(final Collection<Approval> approvals) {
         boolean success = true;
 
-        final Collection<MongoApproval> mongoApprovals = transform(approvals, toMongoApproval());
+        final Collection<MongoApproval> mongoApprovals = transformToMongoApproval(approvals);
 
         for (final MongoApproval mongoApproval : mongoApprovals) {
             if (handleRevocationsAsExpiry) {
@@ -64,26 +64,27 @@ public class MongoApprovalStore implements ApprovalStore {
     public Collection<Approval> getApprovals(final String userId,
                                              final String clientId) {
         final List<MongoApproval> mongoApprovals = mongoApprovalRepository.findByUserIdAndClientId(userId, clientId);
-        return transform(mongoApprovals, toApproval());
+        return transformToApprovals(mongoApprovals);
     }
 
-    private Function<Approval, MongoApproval> toMongoApproval() {
-        return approval -> new MongoApproval(UUID.randomUUID().toString(),
-                approval.getUserId(),
-                approval.getClientId(),
-                approval.getScope(),
-                approval.getStatus() == null ? Approval.ApprovalStatus.APPROVED: approval.getStatus(),
-                convertTolocalDateTimeFrom(approval.getExpiresAt()),
-                convertTolocalDateTimeFrom(approval.getLastUpdatedAt()));
-    }
-
-    private Function<MongoApproval, Approval> toApproval() {
-        return mongoApproval -> new Approval(mongoApproval.getUserId(),
+    private List<Approval> transformToApprovals(final List<MongoApproval> mongoApprovals) {
+        return mongoApprovals.stream().map(mongoApproval -> new Approval(mongoApproval.getUserId(),
                 mongoApproval.getClientId(),
                 mongoApproval.getScope(),
                 Date.from(mongoApproval.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant()),
                 mongoApproval.getStatus(),
-                Date.from(mongoApproval.getLastUpdatedAt().atZone(ZoneId.systemDefault()).toInstant()));
+                Date.from(mongoApproval.getLastUpdatedAt().atZone(ZoneId.systemDefault()).toInstant())))
+                .collect(Collectors.toList());
+    }
+
+    private List<MongoApproval> transformToMongoApproval(final Collection<Approval> approvals) {
+        return approvals.stream().map(approval -> new MongoApproval(UUID.randomUUID().toString(),
+                approval.getUserId(),
+                approval.getClientId(),
+                approval.getScope(),
+                isNull(approval.getStatus()) ? Approval.ApprovalStatus.APPROVED: approval.getStatus(),
+                convertTolocalDateTimeFrom(approval.getExpiresAt()),
+                convertTolocalDateTimeFrom(approval.getLastUpdatedAt()))).collect(Collectors.toList());
     }
 
     public void setHandleRevocationsAsExpiry(boolean handleRevocationsAsExpiry) {

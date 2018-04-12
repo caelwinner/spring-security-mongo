@@ -2,7 +2,6 @@ package uk.co.caeldev.springsecuritymongo.repositories;
 
 import com.github.fakemongo.junit.FongoRule;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,10 +12,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.caeldev.springsecuritymongo.config.ApplicationConfiguration;
 
+import static com.lordofthejars.nosqlunit.core.LoadStrategyEnum.CLEAN_INSERT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = { ApplicationConfiguration.class })
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = { ApplicationConfiguration.class })
 @ActiveProfiles("test")
 @DirtiesContext
 public class MongoOAuth2AccessTokenRepositoryIntegrationTest {
@@ -28,7 +29,7 @@ public class MongoOAuth2AccessTokenRepositoryIntegrationTest {
     private MongoOAuth2AccessTokenRepository mongoOAuth2AccessTokenRepository;
 
     @Test
-    @UsingDataSet(locations = {"/samples/mongoAccessTokens.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = {"/samples/mongoAccessTokens.json"}, loadStrategy = CLEAN_INSERT)
     public void shouldDeleteTokenByRefreshToken() {
         //Given
         String tokenId = "49d855f31931b6063aa9e315e092f17f";
@@ -41,7 +42,7 @@ public class MongoOAuth2AccessTokenRepositoryIntegrationTest {
     }
 
     @Test
-    @UsingDataSet(locations = {"/samples/mongoAccessTokens.json"}, loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = {"/samples/mongoAccessTokens.json"}, loadStrategy = CLEAN_INSERT)
     public void shouldDeleteTokenById() {
         //Given
         String tokenId = "49d855f31931b6063aa9e315e092f17f";
