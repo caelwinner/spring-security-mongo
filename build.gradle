@@ -71,6 +71,15 @@ signing {
     required = { gradle.taskGraph.hasTask("uploadArchives") && !version.endsWith("SNAPSHOT") }
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled false
+        html.destination file("${buildDir}/jacoco")
+    }
+}
+
 uploadArchives {
     repositories {
         mavenDeployer {
