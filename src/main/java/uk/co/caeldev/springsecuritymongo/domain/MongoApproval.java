@@ -3,6 +3,7 @@ package uk.co.caeldev.springsecuritymongo.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.oauth2.provider.approval.Approval.ApprovalStatus;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,6 @@ public class MongoApproval {
     public MongoApproval() {
     }
 
-    @PersistenceConstructor
     public MongoApproval(final String id,
                          final String userId,
                          final String clientId,
@@ -60,10 +60,12 @@ public class MongoApproval {
         return status;
     }
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     public LocalDateTime getExpiresAt() {
         return expiresAt;
     }
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     public LocalDateTime getLastUpdatedAt() {
         return lastUpdatedAt;
     }
