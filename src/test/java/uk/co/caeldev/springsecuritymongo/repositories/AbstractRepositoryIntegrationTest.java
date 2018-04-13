@@ -12,7 +12,7 @@ import uk.co.caeldev.springsecuritymongo.config.ApplicationConfiguration;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = { ApplicationConfiguration.class })
 @ActiveProfiles("test")
-class AbstractRepositoryIntegrationTest {
+public abstract class AbstractRepositoryIntegrationTest {
 
     @Autowired
     protected MongoClient mongoClient;
