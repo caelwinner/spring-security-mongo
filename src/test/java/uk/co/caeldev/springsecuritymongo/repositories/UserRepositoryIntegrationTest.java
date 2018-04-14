@@ -63,7 +63,7 @@ public class UserRepositoryIntegrationTest extends AbstractRepositoryIntegration
         final User savedUser = userRepository.save(user);
 
         //When
-        userRepository.deleteByUsername(user.getUsername());
+        userRepository.deleteByUsername(savedUser.getUsername());
 
         //Then
         final List<User> all = userRepository.findAll();

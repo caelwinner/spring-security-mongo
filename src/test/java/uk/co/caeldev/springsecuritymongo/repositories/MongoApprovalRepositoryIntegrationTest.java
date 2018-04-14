@@ -1,16 +1,9 @@
 package uk.co.caeldev.springsecuritymongo.repositories;
 
 import com.google.common.collect.Lists;
-import com.mongodb.MongoClient;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.caeldev.springsecuritymongo.builders.MongoApprovalBuilder;
-import uk.co.caeldev.springsecuritymongo.config.ApplicationConfiguration;
 import uk.co.caeldev.springsecuritymongo.domain.MongoApproval;
 
 import java.time.LocalDateTime;

@@ -24,6 +24,7 @@ public class MongoApproval {
     public MongoApproval() {
     }
 
+    @PersistenceConstructor
     public MongoApproval(final String id,
                          final String userId,
                          final String clientId,

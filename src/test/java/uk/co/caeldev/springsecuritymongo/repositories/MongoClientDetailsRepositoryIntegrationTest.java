@@ -35,7 +35,7 @@ public class MongoClientDetailsRepositoryIntegrationTest extends AbstractReposit
         final MongoClientDetails saved = mongoClientDetailsRepository.save(mongoClientDetails);
 
         //When
-        final boolean result = mongoClientDetailsRepository.deleteByClientId(mongoClientDetails.getClientId());
+        final boolean result = mongoClientDetailsRepository.deleteByClientId(saved.getClientId());
 
         //Then
         assertThat(result).isTrue();
